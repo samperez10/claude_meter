@@ -4,7 +4,7 @@
 
 A live usage dashboard for [Claude Code](https://claude.ai/code) pushed to an AX206 USB LCD display. Shows your 5-hour and weekly token utilization, burn rate, cost, and activity state — updated every second.
 
-![preview](claude_meter/claude_icon.png)
+![preview](preview.png)
 
 ---
 
