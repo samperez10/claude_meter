@@ -12,7 +12,6 @@ A live usage dashboard for [Claude Code](https://claude.ai/code) pushed to an AX
 
 | Area | Info |
 |---|---|
-| Header | Claude icon + "Usage" title |
 | Section 1 | 5-hour token utilization % + progress bar + reset countdown |
 | Section 2 | Weekly token utilization % + progress bar + reset countdown |
 | Footer | Burn rate (tok/min) or activity spinner · session cost · model · clock |
