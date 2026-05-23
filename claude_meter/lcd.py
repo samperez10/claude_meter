@@ -32,6 +32,7 @@ class AX206LCD:
         self.debug           = debug
         self.flip_horizontal = flip_horizontal
         self.flip_vertical   = flip_vertical
+        self._connected      = False
         self._connect()
 
     def _connect(self):
@@ -59,7 +60,23 @@ class AX206LCD:
         except Exception:
             print(f"[lcd] Using default dimensions: {self.width}x{self.height}")
 
+        self._connected = True
         self.set_backlight(5)
+
+    def reconnect(self, brightness=5) -> bool:
+        """Try to re-open the USB device after a disconnect. Returns True on success."""
+        print("[lcd] Attempting reconnect...")
+        self.close()
+        try:
+            self._connect()
+            self.set_backlight(brightness)
+            self.clear()
+            print("[lcd] Reconnected successfully.")
+            return True
+        except Exception as e:
+            if self.debug:
+                print(f"[lcd] Reconnect failed: {e}")
+            return False
 
     def _scsi_command(self, cmd, data=None, direction="OUT"):
         if self.dev is None:
@@ -72,6 +89,11 @@ class AX206LCD:
 
         try:
             self.dev.write(0x01, cbw + cmd, timeout=2000)
+        except usb.core.USBError as e:
+            self._connected = False
+            if self.debug:
+                print(f"SCSI write failed (USB): {e}")
+            return False
         except Exception as e:
             if self.debug:
                 print(f"SCSI write failed: {e}")
@@ -81,6 +103,11 @@ class AX206LCD:
             if direction == "OUT":
                 try:
                     self.dev.write(0x01, data, timeout=5000)
+                except usb.core.USBError as e:
+                    self._connected = False
+                    if self.debug:
+                        print(f"Data write failed (USB): {e}")
+                    return False
                 except Exception as e:
                     if self.debug:
                         print(f"Data write failed: {e}")
@@ -89,6 +116,11 @@ class AX206LCD:
                 try:
                     read_data = self.dev.read(0x81, len(data), timeout=5000)
                     data[:len(read_data)] = read_data
+                except usb.core.USBError as e:
+                    self._connected = False
+                    if self.debug:
+                        print(f"Data read failed (USB): {e}")
+                    return False
                 except Exception as e:
                     if self.debug:
                         print(f"Data read failed: {e}")
@@ -97,6 +129,9 @@ class AX206LCD:
         try:
             csw = self.dev.read(0x81, 13, timeout=2000)
             return csw[12] == 0
+        except usb.core.USBError:
+            self._connected = False
+            return False
         except Exception:
             return True
 

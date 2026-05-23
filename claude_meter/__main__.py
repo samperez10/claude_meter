@@ -20,7 +20,9 @@ def push_frame(display, preview, preview_path, frame):
         display.display_image(frame)
         return True
     except Exception as e:
-        print(f"[lcd] Display error: {e}")
+        display._connected = False
+        if display.debug:
+            print(f"[lcd] Display error: {e}")
         return False
 
 
@@ -36,12 +38,19 @@ def main():
                     help="Disable horizontal flip")
     ap.add_argument("--no-flip-v", action="store_true",
                     help="Disable vertical flip")
+    theme_grp = ap.add_mutually_exclusive_group()
+    theme_grp.add_argument("--dark",  action="store_true", default=False,
+                           help="Dark theme (default)")
+    theme_grp.add_argument("--white", action="store_true", default=False,
+                           help="Light/white theme")
     ap.add_argument("--debug",          action="store_true",
                     help="Enable debug output")
     ap.add_argument("--calibrate",      action="store_true",
                     help="Set the 5h window limit to your current usage "
                          "(run when Claude tells you you've hit the limit)")
     args = ap.parse_args()
+
+    config.set_theme("white" if args.white else "dark")
 
     if args.calibrate:
         stats = parse_stats()
@@ -69,6 +78,9 @@ def main():
             print(f"Failed to initialize LCD: {e}")
             print("Falling back to preview mode...")
             args.preview = True
+
+    _reconnect_interval = 5.0  # seconds between reconnect attempts
+    _reconnect_state = [0.0]   # [last_attempt_time] — mutable so the loop can update it
 
     print(f"[claude-lcd] Watching {config.CLAUDE_DIR}")
     print(f"[claude-lcd] Mode: {'preview' if args.preview else 'LCD'}  "
@@ -113,6 +125,14 @@ def main():
     try:
         while True:
             loop_start = time.time()
+
+            # Auto-reconnect if the USB display was unplugged and re-plugged
+            if display is not None and not args.preview and not display._connected:
+                now = time.time()
+                if now - _reconnect_state[0] >= _reconnect_interval:
+                    _reconnect_state[0] = now
+                    print("[lcd] Display disconnected — reconnecting...")
+                    display.reconnect(brightness=args.brightness)
 
             with stats_lock:
                 current_stats = dict(stats)

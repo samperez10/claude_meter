@@ -2,7 +2,7 @@
 
 > Written in Python 3.
 
-A live usage dashboard for [Claude Code](https://claude.ai/code) pushed to an AX206 USB LCD display. Shows your 5-hour and weekly token utilization, burn rate, cost, and activity state — updated every second.
+Claude Meter displays your Claude Code usage live on a small USB LCD screen. It tracks token limits, cost, and activity so you always know where you stand — without opening a browser.
 
 ![preview](preview.png)
 
@@ -77,6 +77,35 @@ python run.py --calibrate
 python run.py --debug
 ```
 
+### Themes
+
+```bash
+# Dark mode (default)
+python run.py
+
+# Explicit dark mode
+python run.py --dark
+
+# Light / white mode
+python run.py --white
+```
+
+`--dark` and `--white` are mutually exclusive. The flags work with `--preview` too, so you can check both themes without an LCD:
+
+```bash
+python run.py --preview --white
+python run.py --preview --dark
+```
+
+### Auto-reconnect
+
+If the LCD is unplugged while the meter is running, it will automatically attempt to reconnect every **5 seconds** once you plug it back in — no restart needed. You'll see:
+
+```
+[lcd] Display disconnected — reconnecting...
+[lcd] Reconnected successfully.
+```
+
 ---
 
 ## How usage is measured
@@ -131,3 +160,5 @@ run.py            — entry point
 **Percentages stuck at 100%** — Run `python run.py --calibrate` then restart normally.
 
 **`pip install pyusb` but still no USB** — On Windows, Zadig must replace the device driver with libusb-win32, not WinUSB.
+
+**Display goes blank / stops updating after unplug** — This is expected; the meter will reconnect automatically when you plug it back in. If it doesn't recover, check that the USB cable is fully seated and the Zadig driver is still assigned to the device.

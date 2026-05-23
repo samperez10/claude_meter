@@ -161,14 +161,13 @@ def _draw_badge(d, text, right_edge, cy, font, bg):
 
 def _draw_robot(d, x, y):
     c    = (220, 70, 70)
-    dark = (10, 15, 25)
     d.rectangle([x + 4,  y,      x + 6,  y + 3],  fill=c)
     d.rectangle([x + 15, y,      x + 17, y + 3],  fill=c)
     d.rectangle([x + 3,  y,      x + 7,  y + 1],  fill=c)
     d.rectangle([x + 14, y,      x + 18, y + 1],  fill=c)
     d.rounded_rectangle([x + 1, y + 3, x + 21, y + 18], radius=2, fill=c)
-    d.rectangle([x + 4,  y + 6,  x + 9,  y + 11], fill=dark)
-    d.rectangle([x + 12, y + 6,  x + 17, y + 11], fill=dark)
+    d.rectangle([x + 4,  y + 6,  x + 9,  y + 11], fill=config.BG)
+    d.rectangle([x + 12, y + 6,  x + 17, y + 11], fill=config.BG)
     d.rectangle([x + 5,  y + 7,  x + 6,  y + 8],  fill=(255, 200, 200))
     d.rectangle([x + 13, y + 7,  x + 14, y + 8],  fill=(255, 200, 200))
 
