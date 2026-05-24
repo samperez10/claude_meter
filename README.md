@@ -4,7 +4,9 @@
 
 Claude Meter displays your Claude Code usage live on a small USB LCD screen. It tracks token limits, cost, and activity so you always know where you stand — without opening a browser.
 
-![preview](preview.png)
+| Dark mode | White mode |
+|:---------:|:----------:|
+| ![dark](dark.png) | ![white](white.png) |
 
 ---
 
